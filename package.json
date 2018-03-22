@@ -53,6 +53,7 @@
     "passport-local": "^1.0.0",
     "passport-oauth": "^1.0.0",
     "passport-openid": "^0.4.0",
+    "passport-telegram-official": "^1.0.3",
     "passport-twitter": "^1.0.4",
     "paypal-rest-sdk": "^1.7.1",
     "pug": "^2.0.0-rc.3",
