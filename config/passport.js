@@ -10,6 +10,7 @@ const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 const OpenIDStrategy = require('passport-openid').Strategy;
 const OAuthStrategy = require('passport-oauth').OAuthStrategy;
 const OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
+const TelegramStrategy = require('passport-telegram-official');
 
 const User = require('../models/User');
 
@@ -405,15 +406,16 @@ passport.use(new InstagramStrategy({
 /**
  * Tumblr API OAuth.
  */
-passport.use('tumblr', new OAuthStrategy({
-  requestTokenURL: 'http://www.tumblr.com/oauth/request_token',
-  accessTokenURL: 'http://www.tumblr.com/oauth/access_token',
-  userAuthorizationURL: 'http://www.tumblr.com/oauth/authorize',
-  consumerKey: process.env.TUMBLR_KEY,
-  consumerSecret: process.env.TUMBLR_SECRET,
-  callbackURL: '/auth/tumblr/callback',
-  passReqToCallback: true
-},
+passport.use('tumblr', new OAuthStrategy(
+  {
+    requestTokenURL: 'http://www.tumblr.com/oauth/request_token',
+    accessTokenURL: 'http://www.tumblr.com/oauth/access_token',
+    userAuthorizationURL: 'http://www.tumblr.com/oauth/authorize',
+    consumerKey: process.env.TUMBLR_KEY,
+    consumerSecret: process.env.TUMBLR_SECRET,
+    callbackURL: '/auth/tumblr/callback',
+    passReqToCallback: true
+  },
   (req, token, tokenSecret, profile, done) => {
     User.findById(req.user._id, (err, user) => {
       if (err) { return done(err); }
@@ -428,14 +430,15 @@ passport.use('tumblr', new OAuthStrategy({
 /**
  * Foursquare API OAuth.
  */
-passport.use('foursquare', new OAuth2Strategy({
-  authorizationURL: 'https://foursquare.com/oauth2/authorize',
-  tokenURL: 'https://foursquare.com/oauth2/access_token',
-  clientID: process.env.FOURSQUARE_ID,
-  clientSecret: process.env.FOURSQUARE_SECRET,
-  callbackURL: process.env.FOURSQUARE_REDIRECT_URL,
-  passReqToCallback: true
-},
+passport.use('foursquare', new OAuth2Strategy(
+  {
+    authorizationURL: 'https://foursquare.com/oauth2/authorize',
+    tokenURL: 'https://foursquare.com/oauth2/access_token',
+    clientID: process.env.FOURSQUARE_ID,
+    clientSecret: process.env.FOURSQUARE_SECRET,
+    callbackURL: process.env.FOURSQUARE_REDIRECT_URL,
+    passReqToCallback: true
+  },
   (req, accessToken, refreshToken, profile, done) => {
     User.findById(req.user._id, (err, user) => {
       if (err) { return done(err); }
@@ -487,14 +490,15 @@ passport.use(new OpenIDStrategy({
 /**
  * Pinterest API OAuth.
  */
-passport.use('pinterest', new OAuth2Strategy({
-  authorizationURL: 'https://api.pinterest.com/oauth/',
-  tokenURL: 'https://api.pinterest.com/v1/oauth/token',
-  clientID: process.env.PINTEREST_ID,
-  clientSecret: process.env.PINTEREST_SECRET,
-  callbackURL: process.env.PINTEREST_REDIRECT_URL,
-  passReqToCallback: true
-},
+passport.use('pinterest', new OAuth2Strategy(
+  {
+    authorizationURL: 'https://api.pinterest.com/oauth/',
+    tokenURL: 'https://api.pinterest.com/v1/oauth/token',
+    clientID: process.env.PINTEREST_ID,
+    clientSecret: process.env.PINTEREST_SECRET,
+    callbackURL: process.env.PINTEREST_REDIRECT_URL,
+    passReqToCallback: true
+  },
   (req, accessToken, refreshToken, profile, done) => {
     User.findById(req.user._id, (err, user) => {
       if (err) { return done(err); }
@@ -504,6 +508,20 @@ passport.use('pinterest', new OAuth2Strategy({
       });
     });
   }
+));
+
+/**
+ * Telegram
+ */
+passport.use('telegram', new TelegramStrategy(
+  {
+    botToken: process.env.TELEGRAM_TOKEN
+  },
+  ((profile, cb) => {
+    console.log('telegram.profile -->', profile, '\n');
+    cb(false, profile);
+    // User.findOrCreate({ telegramId: profile.id }, (err, user) => cb(err, user));
+  })
 ));
 
 /**
